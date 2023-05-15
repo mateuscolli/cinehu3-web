@@ -89,14 +89,22 @@ module.exports = {
         react: {
             version: 'detect'
         },
-        'import/extensions': [
-            '.js',
-            '.ts',
-            '.jsx',
-            '.tsx'
-        ],
         'import/parsers': {
             '@typescript-eslint/parser': [ '.ts', '.tsx' ]
+        },
+        'import/resolver': {
+            node: {
+                extensions: [
+                    '.js',
+                    '.ts',
+                    '.jsx',
+                    '.tsx'
+                ],
+                moduleDirectory: [
+                    'node_modules',
+                    'src'
+                ]
+            }
         },
         polyfills: [
             // Native Promises Only
@@ -245,7 +253,8 @@ module.exports = {
                 'Windows': 'readonly'
             },
             rules: {
-                '@typescript-eslint/no-floating-promises': ['warn']
+                '@typescript-eslint/no-floating-promises': ['warn'],
+                '@typescript-eslint/prefer-string-starts-ends-with': ['error']
             }
         },
         // TypeScript source files
