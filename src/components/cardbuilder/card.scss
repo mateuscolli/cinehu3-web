@@ -270,6 +270,7 @@ button::-moz-focus-inner {
 .cardFooter {
     padding: 0.3em 0.3em 0.5em 0.3em;
     position: relative;
+    height: 5em;
 }
 
 .visualCardBox {
@@ -299,9 +300,7 @@ button::-moz-focus-inner {
 
 .cardText {
     padding: 0.06em 0.5em;
-    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
 
     [dir="ltr"] & {
         text-align: left;

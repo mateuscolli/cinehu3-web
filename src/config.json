@@ -13,8 +13,7 @@
     }, {
       "name": "Dark",
       "id": "dark",
-      "color": "#202020",
-      "default": true
+      "color": "#202020"
     }, {
       "name": "Light",
       "id": "light",
@@ -27,6 +26,11 @@
       "name": "WMC",
       "id": "wmc",
       "color": "#0c2450"
+    }, {
+      "name": "CineHu3",
+      "id": "cinehu3",
+      "color": "#7a39d5",
+      "default": true
     }
   ],
   "menuLinks": [],

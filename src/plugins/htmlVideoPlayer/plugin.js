@@ -867,26 +867,26 @@ export class HtmlVideoPlayer {
     }
 
     /**
-         * @private
-         * @param e {Event} The event received from the `<video>` element
-         */
+     * @private
+     * @param e {Event} The event received from the `<video>` element
+     */
     onEnded = (e) => {
         /**
-             * @type {HTMLMediaElement}
-             */
+         * @type {HTMLMediaElement}
+         */
         const elem = e.target;
         this.destroyCustomTrack(elem);
         onEndedInternal(this, elem, this.onError);
     };
 
     /**
-         * @private
-         * @param e {Event} The event received from the `<video>` element
-         */
+     * @private
+     * @param e {Event} The event received from the `<video>` element
+     */
     onTimeUpdate = (e) => {
         /**
-             * @type {HTMLMediaElement}
-             */
+         * @type {HTMLMediaElement}
+         */
         const elem = e.target;
         // get the player position and the transcoding offset
         const time = elem.currentTime;
@@ -957,13 +957,13 @@ export class HtmlVideoPlayer {
     }
 
     /**
-         * @private
-         * @param e {Event} The event received from the `<video>` element
-         */
+     * @private
+     * @param e {Event} The event received from the `<video>` element
+     */
     onPlaying = (e) => {
         /**
-             * @type {HTMLMediaElement}
-             */
+         * @type {HTMLMediaElement}
+         */
         const elem = e.target;
         if (!this.#started) {
             this.#started = true;
@@ -1558,8 +1558,8 @@ export class HtmlVideoPlayer {
     }
 
     /**
-         * @private
-         */
+     * @private
+     */
     createMediaElement(options) {
         const dlg = document.querySelector('.videoPlayerContainer');
 
@@ -1597,7 +1597,8 @@ export class HtmlVideoPlayer {
 
                 videoElement.volume = getSavedVolume();
                 videoElement.addEventListener('timeupdate', this.onTimeUpdate);
-                videoElement.addEventListener('ended', this.onEnded);
+                if (options.item.Type != 'TvChannel')
+                    videoElement.addEventListener('ended', this.onEnded);
                 videoElement.addEventListener('volumechange', this.onVolumeChange);
                 videoElement.addEventListener('pause', this.onPause);
                 videoElement.addEventListener('playing', this.onPlaying);

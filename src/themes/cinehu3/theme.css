@@ -1,5 +1,8 @@
 * {
+    scrollbar-width: thin;
     scrollbar-color: #3b3b3b #202020;
+
+    font-family: 'Raleway', sans-serif;
 }
 
 .skinHeader,
@@ -11,7 +14,7 @@ html {
 .wizardStartForm,
 .ui-corner-all,
 .ui-shadow {
-    background-color: #303030;
+    background-color: #101010;
 }
 
 .emby-collapsible-button {
@@ -20,14 +23,12 @@ html {
 }
 
 .skinHeader-withBackground {
-    background: #303030;
-    background: linear-gradient(to right, #291a31, #033664, #011432, #141a3a, #291a31);
+    background-color: #202020;
 }
 
 .skinHeader.semiTransparent {
     backdrop-filter: none !important;
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .layout-tv .skinHeader.semiTransparent {
@@ -35,73 +36,68 @@ html {
 }
 
 .pageTitleWithDefaultLogo {
-    background-image: url(../../assets/img/logo-header.png);
+    background-image: url(../../assets/img/logoHeader.png);
+    background-size: 10em;
 }
 
 .layout-tv .pageTitleWithDefaultLogo {
     background-image: url(../../assets/img/icon-transparent.png);
 }
 
+.backgroundContainer {
+    background-image: url(../../assets/img/bg-home.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    filter: blur(10px);
+    opacity: 0.3;
+}
+
+.backgroundContainer,
 .dialog,
 .nowPlayingPlaylist,
 .nowPlayingContextMenu,
 html {
-    background-color: #033361;
-}
-
-.backgroundContainer {
-    background: url(bg.jpg) center top no-repeat #033361;
-    background-size: cover;
+    background-color: #101010;
 }
 
 .backgroundContainer.withBackdrop {
-    opacity: 0.86;
-}
-
-@media (orientation: portrait) {
-    .backgroundContainer {
-        background-position: 30% top;
-    }
+    background-color: rgba(0, 0, 0, 0.86);
 }
 
 @media (hover: hover) and (pointer: fine) {
     .paper-icon-button-light:hover:not(:disabled) {
-        color: #00a4dc;
-        background-color: rgba(0, 164, 220, 0.2);
+        color: #7a39d5;
+        background-color: rgb(122 57 213 / 26%);
     }
 }
 
 .paper-icon-button-light:active:not(:disabled) {
-    color: #00a4dc;
-    background-color: rgba(0, 164, 220, 0.2);
+    color: #7a39d5;
+    background-color: rgb(122 57 213 / 26%);
 }
 
 .paper-icon-button-light.show-focus:focus {
-    color: #00a4dc;
+    color: #7a39d5;
 }
 
 .fab,
 .raised {
-    background: rgba(0, 0, 0, 0.5);
+    background: #303030;
     color: rgba(255, 255, 255, 0.87);
 }
 
 .fab:focus,
 .raised:focus {
-    background: rgba(0, 0, 0, 0.7);
-}
-
-a[data-role=button] {
-    background: rgba(0, 0, 0, 0.5) !important;
+    background: #383838;
 }
 
 .button-submit {
-    background: #00a4dc;
+    background: #7a39d5;
     color: #fff;
 }
 
 .button-submit:focus {
-    background: #0cb0e8;
+    background: #600ce8;
     color: #fff;
 }
 
@@ -126,7 +122,7 @@ a[data-role=button] {
 .inputLabelFocused,
 .selectLabelFocused,
 .textareaLabelFocused {
-    color: #00a4dc;
+    color: #7a39d5;
 }
 
 .checkboxOutline {
@@ -138,7 +134,7 @@ a[data-role=button] {
 .formDialogHeader:not(.formDialogHeader-clear),
 .paperList,
 .visualCardBox {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: #202020;
 }
 
 .layout-tv .formDialogFooter:not(.formDialogFooter-clear) {
@@ -146,23 +142,23 @@ a[data-role=button] {
 }
 
 .defaultCardBackground1 {
-    background-color: #213440;
+    background-color: #20005c;
 }
 
 .defaultCardBackground2 {
-    background-color: #8c6565;
+    background-color: #7b44e1;
 }
 
 .defaultCardBackground3 {
-    background-color: #57778c;
+    background-color: #5f00db;
 }
 
 .defaultCardBackground4 {
-    background-color: #8c8c49;
+    background-color: #3a1c5c;
 }
 
 .defaultCardBackground5 {
-    background-color: #404024;
+    background-color: #4e00a8;
 }
 
 .cardText-secondary,
@@ -194,29 +190,22 @@ a[data-role=button] {
 
 .appfooter,
 .playlistSectionButton {
-    background: #033664;
+    background: #202020;
     color: #ccc;
     color: rgba(255, 255, 255, 0.78);
 }
 
-@supports (backdrop-filter:blur(10px)) or (-webkit-backdrop-filter:blur(10px)) {
-    .appfooter {
-        background: rgba(1, 2, 50, 0.7);
-        backdrop-filter: blur(20px);
-    }
-}
-
 .itemSelectionPanel {
-    border: 1px solid #00a4dc;
+    border: 1px solid #7a39d5;
 }
 
 .selectionCommandsPanel {
-    background: #00a4dc;
+    background: #7a39d5;
     color: #fff;
 }
 
 .upNextDialog-countdownText {
-    color: #00a4dc;
+    color: #7a39d5;
 }
 
 .alphaPickerButton {
@@ -230,17 +219,8 @@ a[data-role=button] {
 }
 
 .alphaPickerButton-tv:focus {
-    background-color: #00a4dc;
+    background-color: #7a39d5;
     color: #fff !important;
-}
-
-.detailRibbon {
-    background: #303030;
-    background: linear-gradient(to right, #291a31, #033664, #011432, #141a3a, #291a31);
-}
-
-.layout-tv .detailRibbon {
-    background: none;
 }
 
 .detailTableBodyRow-shaded:nth-child(even) {
@@ -248,32 +228,36 @@ a[data-role=button] {
     background: rgba(30, 30, 30, 0.9);
 }
 
+.detailRibbon {
+    background: rgba(32, 32, 32, 0.8);
+}
+
+.layout-tv .detailRibbon {
+    background: none;
+}
+
 .listItem-border {
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(34, 34, 34, 0.9) !important;
 }
 
 .listItem:focus {
-    background: rgba(0, 0, 0, 0.3);
+    background: #333;
 }
 
 .listItem:hover {
-    background: rgba(0, 0, 0, 0.15);
-}
-
-.actionSheetMenuItem:hover {
-    background-color: rgba(0, 0, 0, 0.5);
+    background: #242424;
 }
 
 .progressring-spiner {
-    border-color: #00a4dc;
+    border-color: #7a39d5;
 }
 
 .button-flat:hover {
-    color: #00a4dc;
+    color: #7a39d5;
 }
 
 .button-link {
-    color: #00a4dc;
+    color: #7a39d5;
 }
 
 .mediaInfoText {
@@ -284,20 +268,20 @@ a[data-role=button] {
 .emby-input,
 .emby-textarea {
     color: inherit;
-    background: rgba(0, 0, 0, 0.5);
-    border: 0.16em solid transparent;
+    background: #292929;
+    border: 0.16em solid #292929;
     border-radius: 0.2em;
 }
 
 .emby-input:focus,
 .emby-textarea:focus {
-    border-color: #00a4dc;
+    border-color: #7a39d5;
 }
 
 .emby-select-withcolor {
     color: inherit;
-    background: rgba(0, 0, 0, 0.5);
-    border: 0.07em solid transparent;
+    background: #292929;
+    border: 0.07em solid #292929;
 }
 
 .emby-select-withcolor > option {
@@ -306,16 +290,16 @@ a[data-role=button] {
 }
 
 .emby-select-withcolor:focus {
-    border-color: #00a4dc !important;
+    border-color: #7a39d5 !important;
 }
 
 .emby-select-tv-withcolor:focus {
-    background-color: #00a4dc !important;
+    background-color: #7a39d5 !important;
     color: #fff !important;
 }
 
 .emby-checkbox:checked + span + .checkboxOutline {
-    border-color: #00a4dc;
+    border-color: #7a39d5;
 }
 
 .emby-checkbox:focus + span + .checkboxOutline {
@@ -324,11 +308,11 @@ a[data-role=button] {
 
 .emby-checkbox:checked + span + .checkboxOutline,
 .itemProgressBarForeground {
-    background-color: #00a4dc;
+    background-color: #7a39d5;
 }
 
 .emby-checkbox:focus:not(:checked) + span + .checkboxOutline {
-    border-color: #00a4dc;
+    border-color: #7a39d5;
 }
 
 .itemProgressBarForeground-recording {
@@ -339,32 +323,29 @@ a[data-role=button] {
 .fullSyncIndicator,
 .mediaSourceIndicator,
 .playedIndicator {
-    background: #00a4dc;
+    background: #7a39d5;
 }
 
 .fullSyncIndicator {
     color: #fff;
 }
 
-.mainDrawer {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
+.mainDrawer,
 .drawer-open {
-    background-color: #011432;
+    background-color: #101010;
 }
 
 .navMenuOption:hover {
-    background: rgba(221, 221, 221, 0.068);
+    background: #252528;
 }
 
 .navMenuOption-selected {
-    background: #00a4dc !important;
+    background: #7a39d5 !important;
     color: #fff;
 }
 
 .emby-button.show-focus:focus {
-    background: #00a4dc;
+    background: #7a39d5;
     color: #fff;
 }
 
@@ -373,15 +354,15 @@ a[data-role=button] {
 }
 
 .emby-tab-button-active {
-    color: #00a4dc;
+    color: #fff;
 }
 
 .emby-tab-button.show-focus:focus {
-    color: #00a4dc;
+    color: #7A39D5;
 }
 
 .emby-tab-button:hover {
-    color: #00a4dc;
+    color: #7A39D5;
 }
 
 .channelPrograms,
@@ -407,12 +388,12 @@ a[data-role=button] {
 }
 
 .programCell-active {
-    background: rgba(0, 0, 0, 0.4) !important;
+    background: #1e1e1e !important;
 }
 
 .guide-channelHeaderCell:focus,
 .programCell:focus {
-    background-color: #00a4dc !important;
+    background-color: #7a39d5 !important;
     color: #fff !important;
 }
 
@@ -432,11 +413,11 @@ a[data-role=button] {
 
 .guide-date-tab-button.emby-tab-button-active,
 .guide-date-tab-button:focus {
-    color: #00a4dc;
+    color: #7a39d5;
 }
 
 .guide-date-tab-button.show-focus:focus {
-    background-color: #00a4dc;
+    background-color: #7a39d5;
     color: #fff;
 }
 
@@ -461,20 +442,12 @@ a[data-role=button] {
 }
 
 .buttonActive {
-    color: #00a4dc !important;
-}
-
-.cardBox:not(.visualCardBox) .cardPadder {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.cardPadder .cardImageIcon {
-    color: rgba(0, 0, 0, 0.5);
+    color: #7a39d5 !important;
 }
 
 .card:focus .cardBox.visualCardBox,
 .card:focus .cardBox:not(.visualCardBox) .cardScalable {
-    border-color: #00a4dc !important;
+    border-color: #7a39d5 !important;
 }
 
 ::-webkit-scrollbar-track {
@@ -487,8 +460,8 @@ a[data-role=button] {
 
 .layout-desktop ::-webkit-scrollbar,
 .layout-tv ::-webkit-scrollbar {
-    width: 1em;
-    height: 1em;
+    width: 0.4em;
+    height: 0.4em;
 }
 
 ::-webkit-scrollbar-thumb:horizontal,
@@ -502,5 +475,56 @@ a[data-role=button] {
 }
 
 .metadataSidebarIcon {
-    color: #00a4dc;
+    color: #7a39d5;
+}
+
+.emby-button.detailFloatingButton {
+    background-color: #7a39d5;
+    color: #fff;
+}
+
+.layout-tv .emby-button.detailFloatingButton:focus {
+    background-color: #f2f2f2;
+    color: #7a39d5;
+}
+
+#comicsPlayer,
+#bookPlayer,
+#pdfPlayer {
+    background: #101010;
+}
+
+#comicsPlayer .swiper-pagination {
+    background: #101010;
+    color: #fff;
+}
+
+#bookPlayer .topButtons {
+    color: #fff;
+}
+
+#comicsPlayer .actionButtonIcon,
+#pdfPlayer .actionButtonIcon {
+    color: #fff;
+}
+
+#dialogToc {
+    background-color: #101010;
+}
+
+#dialogToc .bookplayerButtonIcon {
+    color: #ccc;
+}
+
+#dialogToc .bookplayerButtonIcon:hover {
+    color: #7a39d5;
+}
+
+#dialogToc .toc li a:link {
+    color: #ccc;
+}
+
+#dialogToc .toc li a:active,
+#dialogToc .toc li a:hover {
+    color: #7a39d5;
 }

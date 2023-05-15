@@ -160,6 +160,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    margin-right: 0.5em;
 }
 
 .noHeaderRight .headerRight,
@@ -169,7 +170,7 @@
 
 .pageTitle {
     display: inline-flex;
-    height: 1.7em;
+    height: 2em;
     align-items: center;
     flex-shrink: 1;
 

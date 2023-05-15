@@ -1,8 +1,8 @@
 {
-    "name": "Jellyfin",
+    "name": "CineHu3 2000",
     "description": "The Free Software Media System",
     "lang": "en-US",
-    "short_name": "Jellyfin",
+    "short_name": "CineHu3 2000",
     "start_url": "index.html#!/home.html",
     "theme_color": "#101010",
     "background_color": "#101010",
