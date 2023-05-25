@@ -369,6 +369,9 @@ function buildCardsHtmlInternal(items, options) {
     let lastServerId;
 
     for (const [i, item] of items.entries()) {
+        // TODO 001 - Criar opção para exibir os cards desejados
+        if (item.Name == 'Recordings') continue;
+
         const serverId = item.ServerId || options.serverId;
 
         if (serverId !== lastServerId) {

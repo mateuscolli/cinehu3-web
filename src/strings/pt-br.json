@@ -1162,6 +1162,7 @@
     "LabelUserLoginAttemptsBeforeLockout": "Tentativas de login com falha antes do usuário ser bloqueado",
     "DashboardVersionNumber": "Versão: {0}",
     "DashboardServerName": "Servidor: {0}",
+    "DashboardDiskInfos": "Armazenamento: {0}",
     "DashboardOperatingSystem": "Sistema Operacional: {0}",
     "DashboardArchitecture": "Arquitetura: {0}",
     "LabelPasswordResetProvider": "Provedor para Redefinir a Senha",

@@ -105,17 +105,19 @@ export default function (view) {
             episodeTitle: false
         });
 
-        const secondaryMediaInfo = view.querySelector('.osdSecondaryMediaInfo');
-        const secondaryMediaInfoHtml = mediaInfo.getSecondaryMediaInfoHtml(displayItem, {
-            startDate: false,
-            programTime: false
-        });
-        secondaryMediaInfo.innerHTML = secondaryMediaInfoHtml;
+        if (currentItem.Type != 'TvChannel' && currentItem.Type != 'Program') {
+            const secondaryMediaInfo = view.querySelector('.osdSecondaryMediaInfo');
+            const secondaryMediaInfoHtml = mediaInfo.getSecondaryMediaInfoHtml(displayItem, {
+                startDate: false,
+                programTime: false
+            });
+            secondaryMediaInfo.innerHTML = secondaryMediaInfoHtml;
 
-        if (secondaryMediaInfoHtml) {
-            secondaryMediaInfo.classList.remove('hide');
-        } else {
-            secondaryMediaInfo.classList.add('hide');
+            if (secondaryMediaInfoHtml) {
+                secondaryMediaInfo.classList.remove('hide');
+            } else {
+                secondaryMediaInfo.classList.add('hide');
+            }
         }
 
         if (enableProgressByTimeOfDay) {
@@ -207,6 +209,11 @@ export default function (view) {
         } else {
             view.querySelector('.btnPreviousChapter').classList.add('hide');
             view.querySelector('.btnNextChapter').classList.add('hide');
+        }
+
+        if (currentItem.Type == 'TvChannel' || currentItem.Type == 'Program') {
+            view.querySelector('.sliderElement').classList.add('hide');
+            view.querySelector('.buttonsControls').classList.add('hide');
         }
     }
 

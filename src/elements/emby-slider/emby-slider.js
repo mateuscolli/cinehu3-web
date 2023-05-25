@@ -104,12 +104,12 @@ function updateValues(isValueSet) {
             backgroundLower.style.width = fraction + '%';
         }
 
-        if (range.markerContainerElement) {
-            if (!range.triedAddingMarkers) {
-                addMarkers(range);
-            }
-            updateMarkers(range, value);
-        }
+        // if (range.markerContainerElement) {
+        //     if (!range.triedAddingMarkers) {
+        //         addMarkers(range);
+        //     }
+        //     updateMarkers(range, value);
+        // }
     });
 }
 

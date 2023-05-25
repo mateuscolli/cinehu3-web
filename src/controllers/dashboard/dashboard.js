@@ -201,6 +201,8 @@ function reloadSystemInfo(view, apiClient) {
     apiClient.getSystemInfo().then(function (systemInfo) {
         view.querySelector('#serverName').innerText = globalize.translate('DashboardServerName', systemInfo.ServerName);
         view.querySelector('#versionNumber').innerText = globalize.translate('DashboardVersionNumber', systemInfo.Version);
+        if (systemInfo.DiskSpaceInfo != '-1')
+            view.querySelector('#diskInfos').innerText = globalize.translate('DashboardDiskInfos', systemInfo.DiskSpaceInfo);
 
         if (systemInfo.CanSelfRestart) {
             view.querySelector('#btnRestartServer').classList.remove('hide');
