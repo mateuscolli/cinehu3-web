@@ -17,6 +17,7 @@ import keyboardnavigation from '../../../scripts/keyboardNavigation';
 import '../../../styles/scrollstyles.scss';
 import '../../../elements/emby-slider/emby-slider';
 import '../../../elements/emby-button/paper-icon-button-light';
+import '../../../elements/emby-ratingbutton/emby-ratingbutton';
 import '../../../styles/videoosd.scss';
 import ServerConnections from '../../../components/ServerConnections';
 import shell from '../../../scripts/shell';
@@ -134,6 +135,17 @@ export default function (view) {
             endTimeText.innerHTML = '';
             programStartDateMs = 0;
             programEndDateMs = 0;
+        }
+
+        // Set currently playing item for favorite button
+        const btnUserRating = view.querySelector('.btnUserRating');
+
+        if (itemHelper.canRate(currentItem)) {
+            btnUserRating.classList.remove('hide');
+            btnUserRating.setItem(currentItem);
+        } else {
+            btnUserRating.classList.add('hide');
+            btnUserRating.setItem(null);
         }
     }
 
@@ -301,8 +313,7 @@ export default function (view) {
 
     function onHideAnimationComplete(e) {
         const elem = e.target;
-        if (elem != osdBottomElement)
-            return;
+        if (elem != osdBottomElement) return;
         elem.classList.add('hide');
         dom.removeEventListener(elem, transitionEndEventName, onHideAnimationComplete, {
             once: true
@@ -387,11 +398,9 @@ export default function (view) {
             case 'left':
                 if (currentVisibleMenu === 'osd') {
                     showOsd();
-                } else {
-                    if (!currentVisibleMenu) {
-                        e.preventDefault();
-                        playbackManager.rewind(player);
-                    }
+                } else if (!currentVisibleMenu) {
+                    e.preventDefault();
+                    playbackManager.rewind(player);
                 }
 
                 break;
@@ -661,7 +670,7 @@ export default function (view) {
         if (item.Type === 'TvChannel') {
             const program = item.CurrentProgram;
 
-            if (program && program.EndDate) {
+            if (program?.EndDate) {
                 try {
                     const endDate = datetime.parseISO8601Date(program.EndDate);
 
@@ -1680,7 +1689,7 @@ export default function (view) {
         ticks *= value;
         const item = currentItem;
 
-        if (item && item.Chapters && item.Chapters.length && item.Chapters[0].ImageTag) {
+        if (item?.Chapters?.length && item.Chapters[0].ImageTag) {
             const html = getChapterBubbleHtml(ServerConnections.getApiClient(item.ServerId), item, item.Chapters, ticks);
 
             if (html) {
@@ -1733,6 +1742,9 @@ export default function (view) {
     });
     view.querySelector('.btnAudio').addEventListener('click', showAudioTrackSelection);
     view.querySelector('.btnSubtitles').addEventListener('click', showSubtitleTrackSelection);
+
+    // HACK: Remove `emby-button` from the rating button to make it look like the other buttons
+    view.querySelector('.btnUserRating').classList.remove('emby-button');
 
     // Register to SyncPlay playback events and show big animated icon
     const showIcon = (action) => {

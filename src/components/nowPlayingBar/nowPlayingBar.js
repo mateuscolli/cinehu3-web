@@ -30,6 +30,7 @@ let volumeSlider;
 let volumeSliderContainer;
 let playPauseButtons;
 let positionSlider;
+let toggleAirPlayButton;
 let toggleRepeatButton;
 let toggleRepeatButtonIcon;
 
@@ -77,6 +78,8 @@ function getNowPlayingBarHtml() {
     html += '<div class="sliderContainer nowPlayingBarVolumeSliderContainer hide" style="width:9em;vertical-align:middle;display:inline-flex;">';
     html += '<input type="range" is="emby-slider" pin step="1" min="0" max="100" value="0" class="slider-medium-thumb nowPlayingBarVolumeSlider"/>';
     html += '</div>';
+
+    html += '<button is="paper-icon-button-light" class="btnAirPlay mediaButton"><span class="material-icons airplay" aria-hidden="true"></span></button>';
 
     html += '<button is="paper-icon-button-light" class="toggleRepeatButton mediaButton"><span class="material-icons repeat" aria-hidden="true"></span></button>';
     html += '<button is="paper-icon-button-light" class="btnShuffleQueue mediaButton"><span class="material-icons shuffle" aria-hidden="true"></span></button>';
@@ -192,6 +195,13 @@ function bindEvents(elem) {
         }
     });
 
+    toggleAirPlayButton = elem.querySelector('.btnAirPlay');
+    toggleAirPlayButton.addEventListener('click', function () {
+        if (currentPlayer) {
+            playbackManager.toggleAirPlay(currentPlayer);
+        }
+    });
+
     elem.querySelector('.btnShuffleQueue').addEventListener('click', function () {
         if (currentPlayer) {
             playbackManager.toggleQueueShuffleMode();
@@ -233,7 +243,7 @@ function bindEvents(elem) {
     positionSlider.getBubbleText = function (value) {
         const state = lastPlayerState;
 
-        if (!state || !state.NowPlayingItem || !currentRuntimeTicks) {
+        if (!state?.NowPlayingItem || !currentRuntimeTicks) {
             return '--:--';
         }
 
@@ -327,6 +337,9 @@ function updatePlayerStateInternal(event, state, player) {
     } else {
         toggleRepeatButton.classList.remove('hide');
     }
+
+    const hideAirPlayButton = supportedCommands.indexOf('AirPlay') === -1;
+    toggleAirPlayButton.classList.toggle('hide', hideAirPlayButton);
 
     updateRepeatModeDisplay(playbackManager.getRepeatMode());
     onQueueShuffleModeChange();
@@ -476,7 +489,7 @@ function imageUrl(item, options) {
     options = options || {};
     options.type = options.type || 'Primary';
 
-    if (item.ImageTags && item.ImageTags[options.type]) {
+    if (item.ImageTags?.[options.type]) {
         options.tag = item.ImageTags[options.type];
         return ServerConnections.getApiClient(item.ServerId).getScaledImageUrl(item.PrimaryImageItemId || item.Id, options);
     }
@@ -636,10 +649,8 @@ function onPlaybackStopped(e, state) {
         if (state.NextMediaType !== 'Audio') {
             hideNowPlayingBar();
         }
-    } else {
-        if (!state.NextMediaType) {
-            hideNowPlayingBar();
-        }
+    } else if (!state.NextMediaType) {
+        hideNowPlayingBar();
     }
 }
 

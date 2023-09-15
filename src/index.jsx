@@ -20,6 +20,7 @@ import { appHost } from './components/apphost';
 import { getPlugins } from './scripts/settings/webSettings';
 import { pluginManager } from './components/pluginManager';
 import packageManager from './components/packageManager';
+import './components/playback/displayMirrorManager.ts';
 import { appRouter, history } from './components/router/appRouter';
 import './elements/emby-button/emby-button';
 import './scripts/autoThemes';
@@ -226,10 +227,8 @@ async function onAppReady() {
                     document.body.appendChild(localStyle);
                 }
                 localStyle.textContent = localCss;
-            } else {
-                if (localStyle) {
-                    localStyle.textContent = '';
-                }
+            } else if (localStyle) {
+                localStyle.textContent = '';
             }
         };
 

@@ -86,7 +86,7 @@ export default function (view, params, tabContent, options) {
             elem.addEventListener('click', onPreviousPageClick);
         }
 
-        tabContent.querySelector('.btnShuffle').classList.toggle('hide', result.TotalRecordCount < 1);
+        tabContent.querySelector('.btnShuffle')?.classList.toggle('hide', result.TotalRecordCount < 1);
 
         isLoading = false;
         loading.hide();
@@ -258,7 +258,7 @@ export default function (view, params, tabContent, options) {
             itemsContainer.refreshItems();
         });
 
-        tabElement.querySelector('.btnShuffle').addEventListener('click', shuffle);
+        tabElement.querySelector('.btnShuffle')?.addEventListener('click', shuffle);
     };
 
     let itemsContainer = tabContent.querySelector('.itemsContainer');
@@ -289,8 +289,8 @@ export default function (view, params, tabContent, options) {
     query = userSettings.loadQuerySettings(savedQueryKey, query);
 
     this.showFilterMenu = function () {
-        import('../../components/filterdialog/filterdialog').then(({ default: filterDialogFactory }) => {
-            const filterDialog = new filterDialogFactory({
+        import('../../components/filterdialog/filterdialog').then(({ default: FilterDialog }) => {
+            const filterDialog = new FilterDialog({
                 query: query,
                 mode: 'movies',
                 serverId: ApiClient.serverId()

@@ -2,7 +2,7 @@ import appSettings from '../../scripts/settings/appSettings';
 import * as userSettings from '../../scripts/settings/userSettings';
 import { playbackManager } from '../../components/playback/playbackmanager';
 import globalize from '../../scripts/globalize';
-import castSenderApiLoader from './castSenderApi';
+import CastSenderApi from './castSenderApi';
 import ServerConnections from '../../components/ServerConnections';
 import alert from '../../components/alert';
 import { PluginType } from '../../types/plugin.ts';
@@ -27,12 +27,10 @@ function sendConnectionResult(isOk) {
         if (resolve) {
             resolve();
         }
+    } else if (reject) {
+        reject();
     } else {
-        if (reject) {
-            reject();
-        } else {
-            playbackManager.removeActivePlayer(PlayerName);
-        }
+        playbackManager.removeActivePlayer(PlayerName);
     }
 }
 
@@ -103,7 +101,7 @@ class CastPlayer {
             return;
         }
 
-        if (!chrome.cast || !chrome.cast.isAvailable) {
+        if (!chrome.cast?.isAvailable) {
             setTimeout(this.initializeCastPlayer.bind(this), 1000);
             return;
         }
@@ -294,7 +292,7 @@ class CastPlayer {
     loadMedia(options, command) {
         if (!this.session) {
             console.debug('no session');
-            return Promise.reject();
+            return Promise.reject(new Error('no session'));
         }
 
         // convert items to smaller stubs to send minimal amount of information
@@ -322,35 +320,46 @@ class CastPlayer {
 
         const session = player.session;
 
-        if (session && session.receiver && session.receiver.friendlyName) {
+        if (session?.receiver?.friendlyName) {
             receiverName = session.receiver.friendlyName;
         }
 
         let apiClient;
-        if (message.options && message.options.ServerId) {
+        if (message.options?.ServerId) {
             apiClient = ServerConnections.getApiClient(message.options.ServerId);
-        } else if (message.options && message.options.items && message.options.items.length) {
+        } else if (message.options?.items?.length) {
             apiClient = ServerConnections.getApiClient(message.options.items[0].ServerId);
         } else {
             apiClient = ServerConnections.currentApiClient();
         }
 
+        /* If serverAddress is localhost,this address can not be used for the cast receiver device.
+         * Use the local address (ULA, Unique Local Address) in that case.
+	 */
+        const serverAddress = apiClient.serverAddress();
+        // eslint-disable-next-line compat/compat
+        const hostname = (new URL(serverAddress)).hostname;
+        const isLocalhost = hostname === 'localhost' || hostname.startsWith('127.') || hostname === '[::1]';
+        const serverLocalAddress = isLocalhost ? apiClient.serverInfo().LocalAddress : serverAddress;
+
         message = Object.assign(message, {
             userId: apiClient.getCurrentUserId(),
             deviceId: apiClient.deviceId(),
             accessToken: apiClient.accessToken(),
-            serverAddress: apiClient.serverAddress(),
+            serverAddress: serverLocalAddress,
             serverId: apiClient.serverId(),
             serverVersion: apiClient.serverVersion(),
             receiverName: receiverName
         });
+
+        console.debug('[chromecastPlayer] message{' + message.command + '; ' + serverAddress + ' -> ' + serverLocalAddress + '}');
 
         const bitrateSetting = appSettings.maxChromecastBitrate();
         if (bitrateSetting) {
             message.maxBitrate = bitrateSetting;
         }
 
-        if (message.options && message.options.items) {
+        if (message.options?.items) {
             message.subtitleAppearance = userSettings.getSubtitleAppearanceSettings();
             message.subtitleBurnIn = appSettings.get('subtitleburnin') || '';
         }
@@ -451,10 +460,10 @@ function onVolumeDownKeyDown() {
 }
 
 function normalizeImages(state) {
-    if (state && state.NowPlayingItem) {
+    if (state?.NowPlayingItem) {
         const item = state.NowPlayingItem;
 
-        if ((!item.ImageTags || !item.ImageTags.Primary) && item.PrimaryImageTag) {
+        if ((!item.ImageTags?.Primary) && item.PrimaryImageTag) {
             item.ImageTags = item.ImageTags || {};
             item.ImageTags.Primary = item.PrimaryImageTag;
         }
@@ -576,7 +585,7 @@ class ChromecastPlayer {
         this.isLocalPlayer = false;
         this.lastPlayerData = {};
 
-        new castSenderApiLoader().load().then(initializeChromecast.bind(this));
+        new CastSenderApi().load().then(initializeChromecast.bind(this));
     }
 
     tryPair() {
@@ -592,14 +601,14 @@ class ChromecastPlayer {
             currentResolve = null;
             currentReject = null;
 
-            return Promise.reject();
+            return Promise.reject(new Error('tryPair failed'));
         }
     }
 
     getTargets() {
         const targets = [];
 
-        if (this._castPlayer && this._castPlayer.hasReceivers) {
+        if (this._castPlayer?.hasReceivers) {
             targets.push(this.getCurrentTargetInfo());
         }
 
@@ -612,7 +621,7 @@ class ChromecastPlayer {
 
         const castPlayer = this._castPlayer;
 
-        if (castPlayer.session && castPlayer.session.receiver && castPlayer.session.receiver.friendlyName) {
+        if (castPlayer.session?.receiver?.friendlyName) {
             appName = castPlayer.session.receiver.friendlyName;
         }
 
@@ -624,6 +633,7 @@ class ChromecastPlayer {
             isLocalPlayer: false,
             appName: PlayerName,
             deviceName: appName,
+            deviceType: 'cast',
             supportedCommands: [
                 'VolumeUp',
                 'VolumeDown',

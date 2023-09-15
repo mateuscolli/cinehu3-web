@@ -157,6 +157,19 @@ export class UserSettings {
     }
 
     /**
+     * Get or set 'Enable Audio Normalization' state.
+     * @param {boolean|undefined} val - Flag to enable 'Enable Audio Normalization' or undefined.
+     * @return {boolean} 'Enable Audio Normalization' state.
+     */
+    enableAudioNormalization(val) {
+        if (val !== undefined) {
+            return this.set('enableAudioNormalization', val.toString(), false);
+        }
+
+        return toBoolean(this.get('enableAudioNormalization', false), true);
+    }
+
+    /**
      * Get or set 'Next Video Info Overlay' state.
      * @param {boolean|undefined} val - Flag to enable 'Next Video Info Overlay' or undefined.
      * @return {boolean} 'Next Video Info Overlay' state.
@@ -417,13 +430,26 @@ export class UserSettings {
     }
 
     /**
+     * Get or set the interval between backdrops when using the backdrop screensaver.
+     * @param {number|undefined} val - The interval between backdrops in seconds.
+     * @return {number} The interval between backdrops in seconds.
+     */
+    backdropScreensaverInterval(val) {
+        if (val !== undefined) {
+            return this.set('backdropScreensaverInterval', val.toString(), false);
+        }
+
+        return parseInt(this.get('backdropScreensaverInterval', false), 10) || 5;
+    }
+
+    /**
      * Get or set library page size.
      * @param {number|undefined} val - Library page size.
      * @return {number} Library page size.
      */
     libraryPageSize(val) {
         if (val !== undefined) {
-            return this.set('libraryPageSize', parseInt(val, 10), false);
+            return this.set('libraryPageSize', val.toString(), false);
         }
 
         const libraryPageSize = parseInt(this.get('libraryPageSize', false), 10);
@@ -442,7 +468,7 @@ export class UserSettings {
      */
     maxDaysForNextUp(val) {
         if (val !== undefined) {
-            return this.set('maxDaysForNextUp', parseInt(val, 10), false);
+            return this.set('maxDaysForNextUp', val.toString(), false);
         }
 
         const maxDaysForNextUp = parseInt(this.get('maxDaysForNextUp', false), 10);
@@ -461,7 +487,7 @@ export class UserSettings {
      */
     enableRewatchingInNextUp(val) {
         if (val !== undefined) {
-            return this.set('enableRewatchingInNextUp', val, false);
+            return this.set('enableRewatchingInNextUp', val.toString(), false);
         }
 
         return toBoolean(this.get('enableRewatchingInNextUp', false), false);
@@ -518,6 +544,24 @@ export class UserSettings {
         }
 
         return this.set(key, JSON.stringify(values));
+    }
+
+    /**
+     * Get view layout setting.
+     * @param {string} key - View Setting key.
+     * @return {string} View Setting value.
+     */
+    getSavedView(key) {
+        return this.get(key + '-_view');
+    }
+
+    /**
+     * Set view layout setting.
+     * @param {string} key - View Setting key.
+     * @param {string} value - View Setting value.
+     */
+    saveViewSetting(key, value) {
+        return this.set(key + '-_view', value);
     }
 
     /**
@@ -592,6 +636,7 @@ export const serverConfig = currentSettings.serverConfig.bind(currentSettings);
 export const allowedAudioChannels = currentSettings.allowedAudioChannels.bind(currentSettings);
 export const preferFmp4HlsContainer = currentSettings.preferFmp4HlsContainer.bind(currentSettings);
 export const enableCinemaMode = currentSettings.enableCinemaMode.bind(currentSettings);
+export const enableAudioNormalization = currentSettings.enableAudioNormalization.bind(currentSettings);
 export const enableNextVideoInfoOverlay = currentSettings.enableNextVideoInfoOverlay.bind(currentSettings);
 export const enableVideoRemainingTime = currentSettings.enableVideoRemainingTime.bind(currentSettings);
 export const enableThemeSongs = currentSettings.enableThemeSongs.bind(currentSettings);
@@ -610,6 +655,7 @@ export const dashboardTheme = currentSettings.dashboardTheme.bind(currentSetting
 export const skin = currentSettings.skin.bind(currentSettings);
 export const theme = currentSettings.theme.bind(currentSettings);
 export const screensaver = currentSettings.screensaver.bind(currentSettings);
+export const backdropScreensaverInterval = currentSettings.backdropScreensaverInterval.bind(currentSettings);
 export const libraryPageSize = currentSettings.libraryPageSize.bind(currentSettings);
 export const maxDaysForNextUp = currentSettings.maxDaysForNextUp.bind(currentSettings);
 export const enableRewatchingInNextUp = currentSettings.enableRewatchingInNextUp.bind(currentSettings);
@@ -624,3 +670,5 @@ export const setFilter = currentSettings.setFilter.bind(currentSettings);
 export const getFilter = currentSettings.getFilter.bind(currentSettings);
 export const customCss = currentSettings.customCss.bind(currentSettings);
 export const disableCustomCss = currentSettings.disableCustomCss.bind(currentSettings);
+export const getSavedView = currentSettings.getSavedView.bind(currentSettings);
+export const saveViewSetting = currentSettings.saveViewSetting.bind(currentSettings);

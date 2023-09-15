@@ -76,7 +76,7 @@ export function loadSections(elem, apiClient, user, userSettings) {
             });
         } else {
             let noLibDescription;
-            if (user['Policy'] && user['Policy']['IsAdministrator']) {
+            if (user.Policy?.IsAdministrator) {
                 noLibDescription = globalize.translate('NoCreatedLibraries', '<br><a id="button-createLibrary" class="button-link">', '</a>');
             } else {
                 noLibDescription = globalize.translate('AskAdminToCreateLibrary');
@@ -216,14 +216,12 @@ function getFetchLatestItemsFn(serverId, parentId, collectionType) {
             if (collectionType === 'music') {
                 limit = 30;
             }
+        } else if (collectionType === 'tvshows') {
+            limit = 5;
+        } else if (collectionType === 'music') {
+            limit = 9;
         } else {
-            if (collectionType === 'tvshows') {
-                limit = 5;
-            } else if (collectionType === 'music') {
-                limit = 9;
-            } else {
-                limit = 8;
-            }
+            limit = 8;
         }
 
         const options = {

@@ -175,14 +175,23 @@ const scrollerFactory = function (frame, options) {
             requiresReflow = false;
 
             // Reset global variables
-            frameSize = o.horizontal ? (frame).offsetWidth : (frame).offsetHeight;
+            const frameStyle = window.getComputedStyle(frame);
+            if (o.horizontal) {
+                frameSize = frame.clientWidth;
+                frameSize -= parseFloat(frameStyle.paddingLeft) + parseFloat(frameStyle.paddingRight);
+            } else {
+                frameSize = frame.clientHeight;
+                frameSize -= parseFloat(frameStyle.paddingTop) + parseFloat(frameStyle.paddingBottom);
+            }
+            frameSize = Math.round(frameSize);
 
             slideeSize = o.scrollWidth || Math.max(slideeElement[o.horizontal ? 'offsetWidth' : 'offsetHeight'], slideeElement[o.horizontal ? 'scrollWidth' : 'scrollHeight']);
 
-            // Set position limits & relativess
+            // Set position limits & relatives
             self._pos.end = Math.max(slideeSize - frameSize, 0);
-            if (globalize.getIsRTL())
+            if (globalize.getIsRTL()) {
                 self._pos.end *= -1;
+            }
         }
     }
 
@@ -249,12 +258,10 @@ const scrollerFactory = function (frame, options) {
             } else {
                 container.scrollTo(0, Math.round(pos));
             }
+        } else if (o.horizontal) {
+            container.scrollLeft = Math.round(pos);
         } else {
-            if (o.horizontal) {
-                container.scrollLeft = Math.round(pos);
-            } else {
-                container.scrollTop = Math.round(pos);
-            }
+            container.scrollTop = Math.round(pos);
         }
     }
 
@@ -498,14 +505,12 @@ const scrollerFactory = function (frame, options) {
                 // If the pointer was released, the path will not become longer and it's
                 // definitely not a drag. If not released yet, decide on next iteration
                 return dragging.released ? dragEnd() : undefined;
-            } else {
+            } else if (o.horizontal ? Math.abs(dragging.pathX) > Math.abs(dragging.pathY) : Math.abs(dragging.pathX) < Math.abs(dragging.pathY)) {
                 // If dragging path is sufficiently long we can confidently start a drag
                 // if drag is in different direction than scroll, ignore it
-                if (o.horizontal ? Math.abs(dragging.pathX) > Math.abs(dragging.pathY) : Math.abs(dragging.pathX) < Math.abs(dragging.pathY)) {
-                    dragging.init = 1;
-                } else {
-                    return dragEnd();
-                }
+                dragging.init = 1;
+            } else {
+                return dragEnd();
             }
         }
 
@@ -904,6 +909,7 @@ scrollerFactory.prototype.toCenter = function (item, immediate) {
 };
 
 scrollerFactory.create = function (frame, options) {
+    // eslint-disable-next-line new-cap
     const instance = new scrollerFactory(frame, options);
     return Promise.resolve(instance);
 };

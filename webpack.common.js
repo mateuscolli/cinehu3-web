@@ -1,6 +1,7 @@
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { DefinePlugin } = require('webpack');
@@ -12,7 +13,6 @@ const Assets = [
 ];
 
 const JassubWasm = [
-    'jassub/dist/jassub-worker.wasm',
     'jassub/dist/default.woff2'
 ];
 
@@ -41,7 +41,8 @@ const config = {
             '@mui/private-theming': '@mui/private-theming/legacy',
             '@mui/styled-engine': '@mui/styled-engine/legacy',
             '@mui/system': '@mui/system/legacy',
-            '@mui/utils': '@mui/utils/legacy'
+            '@mui/utils': '@mui/utils/legacy',
+            '@mui/x-data-grid': '@mui/x-data-grid/legacy'
         }
     },
     plugins: [
@@ -100,6 +101,11 @@ const config = {
                     to: path.resolve(__dirname, './dist')
                 };
             })
+        }),
+        new ForkTsCheckerWebpackPlugin({
+            typescript: {
+                configFile: path.resolve(__dirname, 'tsconfig.json')
+            }
         })
     ],
     output: {
@@ -110,6 +116,8 @@ const config = {
     },
     optimization: {
         runtimeChunk: 'single',
+        removeAvailableModules: false,
+        removeEmptyChunks: false,
         splitChunks: {
             chunks: 'all',
             maxInitialRequests: Infinity,
@@ -162,12 +170,17 @@ const config = {
                 }
             },
             {
-                test: /\.(js|jsx)$/,
+                test: /\.(js|jsx|mjs)$/,
                 include: [
                     path.resolve(__dirname, 'node_modules/event-target-polyfill'),
                     path.resolve(__dirname, 'node_modules/rvfc-polyfill'),
                     path.resolve(__dirname, 'node_modules/@jellyfin/sdk'),
+                    path.resolve(__dirname, 'node_modules/@react-hook/latest'),
+                    path.resolve(__dirname, 'node_modules/@react-hook/passive-layout-effect'),
+                    path.resolve(__dirname, 'node_modules/@react-hook/resize-observer'),
                     path.resolve(__dirname, 'node_modules/@remix-run/router'),
+                    path.resolve(__dirname, 'node_modules/@tanstack/query-core'),
+                    path.resolve(__dirname, 'node_modules/@tanstack/react-query'),
                     path.resolve(__dirname, 'node_modules/@uupaa/dynamic-import-polyfill'),
                     path.resolve(__dirname, 'node_modules/axios'),
                     path.resolve(__dirname, 'node_modules/blurhash'),
@@ -211,14 +224,22 @@ const config = {
                 exclude: /node_modules/,
                 use: [
                     'worker-loader',
-                    'ts-loader'
+                    {
+                        loader: 'ts-loader',
+                        options: {
+                            transpileOnly: true
+                        }
+                    }
                 ]
             },
             {
                 test: /\.(ts|tsx)$/,
                 exclude: /node_modules/,
                 use: [{
-                    loader: 'ts-loader'
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true
+                    }
                 }]
             },
             /* modules that Babel breaks when transforming to ESM */

@@ -104,18 +104,6 @@ export const LEGACY_ADMIN_ROUTES: LegacyRoute[] = [
             view: 'dashboard/metadatanfo.html'
         }
     }, {
-        path: 'notificationsetting.html',
-        pageProps: {
-            controller: 'dashboard/notifications/notification/index',
-            view: 'dashboard/notifications/notification/index.html'
-        }
-    }, {
-        path: 'notificationsettings.html',
-        pageProps: {
-            controller: 'dashboard/notifications/notifications/index',
-            view: 'dashboard/notifications/notifications/index.html'
-        }
-    }, {
         path: 'playbackconfiguration.html',
         pageProps: {
             controller: 'dashboard/playback',
@@ -176,7 +164,7 @@ export const LEGACY_ADMIN_ROUTES: LegacyRoute[] = [
             view: 'dashboard/scheduledtasks/scheduledtasks.html'
         }
     }, {
-        path: 'serveractivity.html',
+        path: 'dashboard/activity',
         pageProps: {
             controller: 'dashboard/serveractivity',
             view: 'dashboard/serveractivity.html'

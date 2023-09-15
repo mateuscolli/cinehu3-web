@@ -6,7 +6,6 @@ module.exports = {
     plugins: [
         '@typescript-eslint',
         'react',
-        'promise',
         'import',
         'eslint-comments',
         'sonarjs'
@@ -20,7 +19,6 @@ module.exports = {
     extends: [
         'eslint:recommended',
         'plugin:react/recommended',
-        // 'plugin:promise/recommended',
         'plugin:import/errors',
         'plugin:eslint-comments/recommended',
         'plugin:compat/recommended',
@@ -32,17 +30,26 @@ module.exports = {
         'brace-style': ['error', '1tbs', { 'allowSingleLine': true }],
         'comma-dangle': ['error', 'never'],
         'comma-spacing': ['error'],
+        'curly': ['error', 'multi-line', 'consistent'],
         'default-case-last': ['error'],
         'eol-last': ['error'],
         'indent': ['error', 4, { 'SwitchCase': 1 }],
         'jsx-quotes': ['error', 'prefer-single'],
         'keyword-spacing': ['error'],
-        'no-throw-literal': ['error'],
         'max-statements-per-line': ['error'],
         'max-params': ['error', 7],
+        'new-cap': [
+            'error',
+            {
+                'capIsNewExceptions': ['jQuery.Deferred'],
+                'newIsCapExceptionPattern': '\\.default$'
+            }
+        ],
         'no-duplicate-imports': ['error'],
         'no-empty-function': ['error'],
+        'no-extend-native': ['error'],
         'no-floating-decimal': ['error'],
+        'no-lonely-if': ['error'],
         'no-multi-spaces': ['error'],
         'no-multiple-empty-lines': ['error', { 'max': 1 }],
         'no-nested-ternary': ['error'],
@@ -54,9 +61,11 @@ module.exports = {
         'no-sequences': ['error', { 'allowInParentheses': false }],
         'no-shadow': ['off'],
         '@typescript-eslint/no-shadow': ['error'],
+        'no-throw-literal': ['error'],
         'no-trailing-spaces': ['error'],
         'no-unused-expressions': ['off'],
         '@typescript-eslint/no-unused-expressions': ['error', { 'allowShortCircuit': true, 'allowTernary': true, 'allowTaggedTemplates': true }],
+        'no-unused-private-class-members': ['error'],
         'no-useless-constructor': ['off'],
         '@typescript-eslint/no-useless-constructor': ['error'],
         'no-var': ['error'],
@@ -68,6 +77,7 @@ module.exports = {
         'padded-blocks': ['error', 'never'],
         'prefer-const': ['error', { 'destructuring': 'all' }],
         '@typescript-eslint/prefer-for-of': ['error'],
+        '@typescript-eslint/prefer-optional-chain': ['error'],
         'quotes': ['error', 'single', { 'avoidEscape': true, 'allowTemplateLiterals': false }],
         'radix': ['error'],
         '@typescript-eslint/semi': ['error'],
@@ -206,10 +216,7 @@ module.exports = {
         // JavaScript source files
         {
             files: [
-                './src/**/*.js',
-                './src/**/*.jsx',
-                './src/**/*.ts',
-                './src/**/*.tsx'
+                './src/**/*.{js,jsx,ts,tsx}'
             ],
             parserOptions: {
                 project: ['./tsconfig.json']
@@ -253,15 +260,13 @@ module.exports = {
                 'Windows': 'readonly'
             },
             rules: {
-                '@typescript-eslint/no-floating-promises': ['warn'],
                 '@typescript-eslint/prefer-string-starts-ends-with': ['error']
             }
         },
         // TypeScript source files
         {
             files: [
-                './src/**/*.ts',
-                './src/**/*.tsx'
+                './src/**/*.{ts,tsx}'
             ],
             extends: [
                 'eslint:recommended',
@@ -274,6 +279,7 @@ module.exports = {
             ],
             rules: {
                 '@typescript-eslint/no-floating-promises': ['error'],
+                '@typescript-eslint/no-unused-vars': ['error'],
 
                 'sonarjs/cognitive-complexity': ['error']
             }

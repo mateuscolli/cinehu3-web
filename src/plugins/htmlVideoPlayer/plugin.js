@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 import browser from '../../scripts/browser';
 import { appHost } from '../../components/apphost';
 import loading from '../../components/loading/loading';
@@ -33,6 +35,7 @@ import { setBackdropTransparency, TRANSPARENCY_LEVEL } from '../../components/ba
 import { PluginType } from '../../types/plugin.ts';
 import Events from '../../utils/events.ts';
 import { includesAny } from '../../utils/container.ts';
+import { isHls } from '../../utils/mediaSource.ts';
 import debounce from 'lodash-es/debounce';
 
 /**
@@ -67,12 +70,12 @@ function tryRemoveElement(elem) {
     }
 }
 
-function enableNativeTrackSupport(currentSrc, track) {
+function enableNativeTrackSupport(mediaSource, track) {
     if (track?.DeliveryMethod === 'Embed') {
         return true;
     }
 
-    if (browser.firefox && (currentSrc || '').toLowerCase().includes('.m3u8')) {
+    if (browser.firefox && isHls(mediaSource)) {
         return false;
     }
 
@@ -137,7 +140,10 @@ function zoomIn(elem) {
 }
 
 function normalizeTrackEventText(text, useHtml) {
-    const result = text.replace(/\\N/gi, '\n').replace(/\r/gi, '');
+    const result = text
+        .replace(/\\N/gi, '\n') // Correct newline characters
+        .replace(/\r/gi, '') // Remove carriage return characters
+        .replace(/{\\.*?}/gi, ''); // Remove ass/ssa tags
     return useHtml ? result.replace(/\n/gi, '<br>') : result;
 }
 
@@ -163,137 +169,140 @@ const SECONDARY_TEXT_TRACK_INDEX = 1;
 
 export class HtmlVideoPlayer {
     /**
-         * @type {string}
-         */
+     * @type {string}
+     */
     name;
     /**
-         * @type {string}
-         */
+     * @type {string}
+     */
     type = PluginType.MediaPlayer;
     /**
-         * @type {string}
-         */
+     * @type {string}
+     */
     id = 'htmlvideoplayer';
     /**
-         * Let any players created by plugins take priority
-         *
-         * @type {number}
-         */
+     * Let any players created by plugins take priority
+     *
+     * @type {number}
+     */
     priority = 1;
     /**
-         * @type {boolean}
-         */
+     * @type {boolean}
+     */
     isFetching = false;
     /**
-         * @type {HTMLDivElement | null | undefined}
-         */
+     * @type {HTMLDivElement | null | undefined}
+     */
     #videoDialog;
     /**
-         * @type {number | undefined}
-         */
+     * @type {number | undefined}
+     */
     #subtitleTrackIndexToSetOnPlaying;
     /**
-         * @type {number | undefined}
-         */
+     * @type {number | undefined}
+     */
     #secondarySubtitleTrackIndexToSetOnPlaying;
     /**
-         * @type {number | null}
-         */
+     * @type {number | null}
+     */
     #audioTrackIndexToSetOnPlaying;
     /**
-         * @type {null | undefined}
-         */
+     * @type {null | undefined}
+     */
     #currentClock;
     /**
-         * @type {any | null | undefined}
-         */
+     * @type {any | null | undefined}
+     */
     #currentAssRenderer;
     /**
-         * @type {null | undefined}
-         */
+     * @type {null | undefined}
+     */
     #customTrackIndex;
     /**
-         * @type {number | undefined}
-         */
+     * @type {number | undefined}
+     */
     #customSecondaryTrackIndex;
     /**
-         * @type {boolean | undefined}
-         */
+     * @type {boolean | undefined}
+     */
     #showTrackOffset;
     /**
-         * @type {number | undefined}
-         */
+     * @type {number | undefined}
+     */
     #currentTrackOffset;
     /**
-         * @type {HTMLElement | null | undefined}
-         */
+     * @type {HTMLElement | null | undefined}
+     */
     #secondaryTrackOffset;
     /**
-         * @type {HTMLElement | null | undefined}
-         */
+     * @type {HTMLElement | null | undefined}
+     */
     #videoSubtitlesElem;
     /**
-         * @type {HTMLElement | null | undefined}
-         */
+     * @type {HTMLElement | null | undefined}
+     */
     #videoSecondarySubtitlesElem;
     /**
-         * @type {any | null | undefined}
-         */
+     * @type {any | null | undefined}
+     */
     #currentTrackEvents;
     /**
-         * @type {any | null | undefined}
-         */
+     * @type {any | null | undefined}
+     */
     #currentSecondaryTrackEvents;
     /**
-         * @type {string[] | undefined}
-         */
+     * @type {string[] | undefined}
+     */
     #supportedFeatures;
     /**
-         * @type {HTMLVideoElement | null | undefined}
-         */
+     * @type {HTMLVideoElement | null | undefined}
+     */
     #mediaElement;
     /**
-         * @type {number}
-         */
+     * @type {number}
+     */
     #fetchQueue = 0;
     /**
-         * @type {string | undefined}
-         */
+     * @type {string | undefined}
+     */
     #currentSrc;
     /**
-         * @type {boolean | undefined}
-         */
+     * @type {boolean | undefined}
+     */
     #started;
     /**
-         * @type {boolean | undefined}
-         */
+     * @type {boolean | undefined}
+     */
     #timeUpdated;
     /**
-         * @type {number | null | undefined}
-         */
+     * @type {number | null | undefined}
+     */
     #currentTime;
+
     /**
-         * @type {any | undefined}
-         */
-    #flvPlayer;
+     * @private (used in other files)
+     * @type {any | undefined}
+     */
+    _flvPlayer;
+
     /**
-         * @private (used in other files)
-         * @type {any | undefined}
-         */
+     * @private (used in other files)
+     * @type {any | undefined}
+     */
     _hlsPlayer;
     /**
-         * @private (used in other files)
-         * @type {any | null | undefined}
-         */
+     * @private (used in other files)
+     * @type {any | null | undefined}
+     */
     _castPlayer;
     /**
-         * @private (used in other files)
-         * @type {any | undefined}
-         */
+     * @private (used in other files)
+     * @type {any | undefined}
+     */
     _currentPlayOptions;
     /**
-         * @type {any | undefined}
-         */
+     * @type {any | undefined}
+     */
     #lastProfile;
 
     constructor() {
@@ -336,15 +345,13 @@ export class HtmlVideoPlayer {
          * @private
          */
     updateVideoUrl(streamInfo) {
-        const isHls = streamInfo.url.toLowerCase().includes('.m3u8');
-
         const mediaSource = streamInfo.mediaSource;
         const item = streamInfo.item;
 
         // Huge hack alert. Safari doesn't seem to like if the segments aren't available right away when playback starts
         // This will start the transcoding process before actually feeding the video url into the player
         // Edit: Also seeing stalls from hls.js
-        if (mediaSource && item && !mediaSource.RunTimeTicks && isHls && streamInfo.playMethod === 'Transcode' && (browser.iOS || browser.osx)) {
+        if (mediaSource && item && !mediaSource.RunTimeTicks && isHls(mediaSource) && streamInfo.playMethod === 'Transcode' && (browser.iOS || browser.osx)) {
             const hlsPlaylistUrl = streamInfo.url.replace('master.m3u8', 'live.m3u8');
 
             loading.show();
@@ -403,7 +410,7 @@ export class HtmlVideoPlayer {
             flvPlayer.attachMediaElement(elem);
             flvPlayer.load();
 
-            this.#flvPlayer = flvPlayer;
+            this._flvPlayer = flvPlayer;
 
             // This is needed in setCurrentTrackElement
             this.#currentSrc = url;
@@ -431,6 +438,7 @@ export class HtmlVideoPlayer {
                 const includeCorsCredentials = await getIncludeCorsCredentials();
 
                 const hls = new Hls({
+                    startPosition: options.playerStartPositionTicks / 10000000,
                     manifestLoadingTimeOut: 20000,
                     maxBufferLength: maxBufferLength,
                     xhrSetup(xhr) {
@@ -507,7 +515,7 @@ export class HtmlVideoPlayer {
             elem.crossOrigin = crossOrigin;
         }
 
-        if (enableHlsJsPlayer(options.mediaSource.RunTimeTicks, 'Video') && val.includes('.m3u8')) {
+        if (enableHlsJsPlayer(options.mediaSource.RunTimeTicks, 'Video') && isHls(options.mediaSource)) {
             return this.setSrcWithHlsJs(elem, options, val);
         } else if (options.playMethod !== 'Transcode' && options.mediaSource.Container === 'flv') {
             return this.setSrcWithFlvJs(elem, options, val);
@@ -858,11 +866,9 @@ export class HtmlVideoPlayer {
 
         if (Screenfull.isEnabled) {
             Screenfull.exit();
-        } else {
+        } else if (document.webkitIsFullScreen && document.webkitCancelFullscreen) {
             // iOS Safari
-            if (document.webkitIsFullScreen && document.webkitCancelFullscreen) {
-                document.webkitCancelFullscreen();
-            }
+            document.webkitCancelFullscreen();
         }
     }
 
@@ -1005,7 +1011,7 @@ export class HtmlVideoPlayer {
         }
 
         if (elem.videoWidth === 0 && elem.videoHeight === 0) {
-            const mediaSource = (this._currentPlayOptions || {}).mediaSource;
+            const mediaSource = this._currentPlayOptions?.mediaSource;
 
             // Only trigger this if there is media info
             // Avoid triggering in situations where it might not actually have a video stream (audio only live tv channel)
@@ -1100,15 +1106,14 @@ export class HtmlVideoPlayer {
                 tryRemoveElement(this.#videoSecondarySubtitlesElem);
                 this.#videoSecondarySubtitlesElem = null;
             }
-        } else { // destroy all
-            if (this.#videoSubtitlesElem) {
-                const subtitlesContainer = this.#videoSubtitlesElem.parentNode;
-                if (subtitlesContainer) {
-                    tryRemoveElement(subtitlesContainer);
-                }
-                this.#videoSubtitlesElem = null;
-                this.#videoSecondarySubtitlesElem = null;
+        } else if (this.#videoSubtitlesElem) {
+            // destroy all
+            const subtitlesContainer = this.#videoSubtitlesElem.parentNode;
+            if (subtitlesContainer) {
+                tryRemoveElement(subtitlesContainer);
             }
+            this.#videoSubtitlesElem = null;
+            this.#videoSecondarySubtitlesElem = null;
         }
     }
 
@@ -1252,37 +1257,45 @@ export class HtmlVideoPlayer {
         const fallbackFontList = apiClient.getUrl('/FallbackFont/Fonts', {
             api_key: apiClient.accessToken()
         });
-        const options = {
-            video: videoElement,
-            subUrl: getTextTrackUrl(track, item),
-            fonts: avaliableFonts,
-            fallbackFont: 'liberation sans',
-            availableFonts: { 'liberation sans': `${appRouter.baseUrl()}/default.woff2` },
-            // Disabled eslint compat, but is safe as corejs3 polyfills URL
-            // eslint-disable-next-line compat/compat
-            workerUrl: new URL('jassub/dist/jassub-worker.js', import.meta.url),
-            // eslint-disable-next-line compat/compat
-            legacyWorkerUrl: new URL('jassub/dist/jassub-worker-legacy.js', import.meta.url),
-            timeOffset: (this._currentPlayOptions.transcodingOffsetTicks || 0) / 10000000,
-            // new jassub options; override all, even defaults
-            blendMode: 'js',
-            asyncRender: true,
-            // firefox implements offscreen canvas, but not according to spec which causes errors
-            offscreenRender: !browser.firefox,
-            // RVFC is polyfilled everywhere, but webOS 2 reports polyfill API's as functional even tho they aren't
-            onDemandRender: browser.web0sVersion !== 2,
-            useLocalFonts: true,
-            dropAllAnimations: false,
-            libassMemoryLimit: 40,
-            libassGlyphLimit: 40,
-            targetFps: 24,
-            prescaleFactor: 0.8,
-            prescaleHeightLimit: 1080,
-            maxRenderHeight: 2160
-        };
             // TODO: replace with `event-target-polyfill` once https://github.com/benlesh/event-target-polyfill/pull/12 or 11 is merged
         import('event-target-polyfill').then(() => {
             import('jassub').then(({ default: JASSUB }) => {
+                // test SIMD support
+                JASSUB._test();
+
+                const options = {
+                    video: videoElement,
+                    subUrl: getTextTrackUrl(track, item),
+                    fonts: avaliableFonts,
+                    fallbackFont: 'liberation sans',
+                    availableFonts: { 'liberation sans': `${appRouter.baseUrl()}/default.woff2` },
+                    // Disabled eslint compat, but is safe as corejs3 polyfills URL
+                    // eslint-disable-next-line compat/compat
+                    workerUrl: new URL('jassub/dist/jassub-worker.js', import.meta.url).href,
+                    // eslint-disable-next-line compat/compat
+                    wasmUrl: new URL('jassub/dist/jassub-worker.wasm', import.meta.url).href,
+                    // eslint-disable-next-line compat/compat
+                    legacyWasmUrl: new URL('jassub/dist/jassub-worker.wasm.js', import.meta.url).href,
+                    // eslint-disable-next-line compat/compat
+                    modernWasmUrl : new URL('jassub/dist/jassub-worker-modern.wasm', import.meta.url).href,
+                    timeOffset: (this._currentPlayOptions.transcodingOffsetTicks || 0) / 10000000,
+                    // new jassub options; override all, even defaults
+                    blendMode: 'js',
+                    asyncRender: true,
+                    offscreenRender: true,
+                    // RVFC is polyfilled everywhere, but webOS 2 reports polyfill API's as functional even tho they aren't
+                    onDemandRender: browser.web0sVersion !== 2,
+                    useLocalFonts: true,
+                    dropAllAnimations: false,
+                    dropAllBlur: !JASSUB._supportsSIMD,
+                    libassMemoryLimit: 40,
+                    libassGlyphLimit: 40,
+                    targetFps: 24,
+                    prescaleFactor: 0.8,
+                    prescaleHeightLimit: 1080,
+                    maxRenderHeight: 2160
+                };
+
                 Promise.all([
                     apiClient.getNamedConfiguration('encoding'),
                     // Worker in Tizen 5 doesn't resolve relative path with async request
@@ -1477,8 +1490,8 @@ export class HtmlVideoPlayer {
                 // add some cues to show the text
                 // in safari, the cues need to be added before setting the track mode to showing
                 for (const trackEvent of data.TrackEvents) {
-                    const trackCueObject = window.VTTCue || window.TextTrackCue;
-                    const cue = new trackCueObject(trackEvent.StartPositionTicks / 10000000, trackEvent.EndPositionTicks / 10000000, normalizeTrackEventText(trackEvent.Text, false));
+                    const TrackCue = window.VTTCue || window.TextTrackCue;
+                    const cue = new TrackCue(trackEvent.StartPositionTicks / 10000000, trackEvent.EndPositionTicks / 10000000, normalizeTrackEventText(trackEvent.Text, false));
 
                     if (cue.line === 'auto') {
                         cue.line = cueLine;
@@ -1523,8 +1536,9 @@ export class HtmlVideoPlayer {
                     }
                 }
 
-                if (selectedTrackEvent && selectedTrackEvent.Text) {
-                    subtitleTextElement.innerHTML = normalizeTrackEventText(selectedTrackEvent.Text, true);
+                if (selectedTrackEvent?.Text) {
+                    subtitleTextElement.innerHTML = DOMPurify.sanitize(
+                        normalizeTrackEventText(selectedTrackEvent.Text, true));
                     subtitleTextElement.classList.remove('hide');
                 } else {
                     subtitleTextElement.classList.add('hide');
@@ -1546,7 +1560,7 @@ export class HtmlVideoPlayer {
         })[0];
 
         this.setTrackForDisplay(this.#mediaElement, track, targetTextTrackIndex);
-        if (enableNativeTrackSupport(this.#currentSrc, track)) {
+        if (enableNativeTrackSupport(this._currentPlayOptions?.mediaSource, track)) {
             if (streamIndex !== -1) {
                 this.setCueAppearance();
             }
@@ -1651,7 +1665,13 @@ export class HtmlVideoPlayer {
                 }
             }
 
-            return Promise.resolve(dlg.querySelector('video'));
+            const videoElement = dlg.querySelector('video');
+            if (options.backdropUrl) {
+                // update backdrop image
+                videoElement.poster = options.backdropUrl;
+            }
+
+            return Promise.resolve(videoElement);
         }
     }
 
@@ -1798,10 +1818,8 @@ export class HtmlVideoPlayer {
             } else {
                 Windows.UI.ViewManagement.ApplicationView.getForCurrentView().tryEnterViewModeAsync(Windows.UI.ViewManagement.ApplicationViewMode.default);
             }
-        } else {
-            if (video && video.webkitSupportsPresentationMode && typeof video.webkitSetPresentationMode === 'function') {
-                video.webkitSetPresentationMode(isEnabled ? 'picture-in-picture' : 'inline');
-            }
+        } else if (video?.webkitSupportsPresentationMode && typeof video.webkitSetPresentationMode === 'function') {
+            video.webkitSetPresentationMode(isEnabled ? 'picture-in-picture' : 'inline');
         }
     }
 
@@ -1878,7 +1896,7 @@ export class HtmlVideoPlayer {
         const mediaElement = this.#mediaElement;
         if (mediaElement) {
             const seekable = mediaElement.seekable;
-            if (seekable && seekable.length) {
+            if (seekable?.length) {
                 let start = seekable.start(0);
                 let end = seekable.end(0);
 

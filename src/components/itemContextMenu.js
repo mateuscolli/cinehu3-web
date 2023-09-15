@@ -109,7 +109,7 @@ export function getCommands(options) {
             });
         }
 
-        if (itemHelper.supportsAddingToCollection(item) && options.EnableCollectionManagement) {
+        if (itemHelper.supportsAddingToCollection(item) && (user.Policy.IsAdministrator || user.Policy.EnableCollectionManagement)) {
             commands.push({
                 name: globalize.translate('AddToCollection'),
                 id: 'addtocollection',
@@ -345,8 +345,8 @@ function executeCommand(item, id, options) {
                 });
                 break;
             case 'addtoplaylist':
-                import('./playlisteditor/playlisteditor').then(({ default: playlistEditor }) => {
-                    new playlistEditor({
+                import('./playlisteditor/playlisteditor').then(({ default: PlaylistEditor }) => {
+                    new PlaylistEditor({
                         items: [itemId],
                         serverId: serverId
                     }).then(getResolveFunction(resolve, id, true), getResolveFunction(resolve, id));
@@ -630,8 +630,8 @@ function deleteItem(apiClient, item) {
 }
 
 function refresh(apiClient, item) {
-    import('./refreshdialog/refreshdialog').then(({ default: refreshDialog }) => {
-        new refreshDialog({
+    import('./refreshdialog/refreshdialog').then(({ default: RefreshDialog }) => {
+        new RefreshDialog({
             itemIds: [item.Id],
             serverId: apiClient.serverInfo().Id,
             mode: item.Type === 'CollectionFolder' ? 'scan' : null

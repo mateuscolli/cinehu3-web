@@ -675,12 +675,12 @@ function Guide(options) {
         });
 
         const activeElement = document.activeElement;
-        const itemId = activeElement && activeElement.getAttribute ? activeElement.getAttribute('data-id') : null;
+        const itemId = activeElement?.getAttribute ? activeElement.getAttribute('data-id') : null;
         let channelRowId = null;
 
         if (activeElement) {
             channelRowId = dom.parentWithClass(activeElement, 'channelPrograms');
-            channelRowId = channelRowId && channelRowId.getAttribute ? channelRowId.getAttribute('data-channelid') : null;
+            channelRowId = channelRowId?.getAttribute ? channelRowId.getAttribute('data-channelid') : null;
         }
 
         renderChannelHeaders(context, channels, apiClient);
@@ -762,12 +762,10 @@ function Guide(options) {
             } else {
                 container.scrollTo(0, pos);
             }
+        } else if (horizontal) {
+            container.scrollLeft = Math.round(pos);
         } else {
-            if (horizontal) {
-                container.scrollLeft = Math.round(pos);
-            } else {
-                container.scrollTop = Math.round(pos);
-            }
+            container.scrollTop = Math.round(pos);
         }
     }
 

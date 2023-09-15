@@ -14,6 +14,7 @@ import alert from '../alert';
 import { PluginType } from '../../types/plugin.ts';
 import { includesAny } from '../../utils/container.ts';
 import { getItems } from '../../utils/jellyfin-apiclient/getItems.ts';
+import { getItemBackdropImageUrl } from '../../utils/jellyfin-apiclient/backdropImage';
 
 const UNLIMITED_ITEMS = -1;
 
@@ -152,28 +153,6 @@ function mergePlaybackQueries(obj1, obj2) {
     }
     query.Filters = filters.join(',');
     return query;
-}
-
-function backdropImageUrl(apiClient, item, options) {
-    options = options || {};
-    options.type = options.type || 'Backdrop';
-
-    // If not resizing, get the original image
-    if (!options.maxWidth && !options.width && !options.maxHeight && !options.height && !options.fillWidth && !options.fillHeight) {
-        options.quality = 100;
-    }
-
-    if (item.BackdropImageTags && item.BackdropImageTags.length) {
-        options.tag = item.BackdropImageTags[0];
-        return apiClient.getScaledImageUrl(item.Id, options);
-    }
-
-    if (item.ParentBackdropImageTags && item.ParentBackdropImageTags.length) {
-        options.tag = item.ParentBackdropImageTags[0];
-        return apiClient.getScaledImageUrl(item.ParentBackdropItemId, options);
-    }
-
-    return null;
 }
 
 function getMimeType(type, container) {
@@ -773,7 +752,7 @@ class PlaybackManager {
 
         self.setActivePlayer = function (player, targetInfo) {
             if (player === 'localplayer' || player.name === 'localplayer') {
-                if (self._currentPlayer && self._currentPlayer.isLocalPlayer) {
+                if (self._currentPlayer?.isLocalPlayer) {
                     return;
                 }
                 setCurrentPlayerInternal(null, null);
@@ -795,7 +774,7 @@ class PlaybackManager {
 
         self.trySetActivePlayer = function (player, targetInfo) {
             if (player === 'localplayer' || player.name === 'localplayer') {
-                if (self._currentPlayer && self._currentPlayer.isLocalPlayer) {
+                if (self._currentPlayer?.isLocalPlayer) {
                     return;
                 }
                 return;
@@ -967,7 +946,7 @@ class PlaybackManager {
                 return player.isPlaying();
             }
 
-            return player != null && player.currentSrc() != null;
+            return player?.currentSrc() != null;
         };
 
         self.isPlayingMediaType = function (mediaType, player) {
@@ -989,7 +968,7 @@ class PlaybackManager {
         self.isPlayingLocally = function (mediaTypes, player) {
             player = player || self._currentPlayer;
 
-            if (!player || !player.isLocalPlayer) {
+            if (!player?.isLocalPlayer) {
                 return false;
             }
 
@@ -1068,7 +1047,7 @@ class PlaybackManager {
         self.setAspectRatio = function (val, player) {
             player = player || self._currentPlayer;
 
-            if (player && player.setAspectRatio) {
+            if (player?.setAspectRatio) {
                 player.setAspectRatio(val);
             }
         };
@@ -1076,7 +1055,7 @@ class PlaybackManager {
         self.getSupportedAspectRatios = function (player) {
             player = player || self._currentPlayer;
 
-            if (player && player.getSupportedAspectRatios) {
+            if (player?.getSupportedAspectRatios) {
                 return player.getSupportedAspectRatios();
             }
 
@@ -1086,7 +1065,7 @@ class PlaybackManager {
         self.getAspectRatio = function (player) {
             player = player || self._currentPlayer;
 
-            if (player && player.getAspectRatio) {
+            if (player?.getAspectRatio) {
                 return player.getAspectRatio();
             }
         };
@@ -1131,7 +1110,7 @@ class PlaybackManager {
 
         self.getSupportedPlaybackRates = function (player) {
             player = player || self._currentPlayer;
-            if (player && player.getSupportedPlaybackRates) {
+            if (player?.getSupportedPlaybackRates) {
                 return player.getSupportedPlaybackRates();
             }
             return [];
@@ -1351,7 +1330,7 @@ class PlaybackManager {
 
         self.getMaxStreamingBitrate = function (player) {
             player = player || self._currentPlayer;
-            if (player && player.getMaxStreamingBitrate) {
+            if (player?.getMaxStreamingBitrate) {
                 return player.getMaxStreamingBitrate();
             }
 
@@ -1370,7 +1349,7 @@ class PlaybackManager {
 
         self.enableAutomaticBitrateDetection = function (player) {
             player = player || self._currentPlayer;
-            if (player && player.enableAutomaticBitrateDetection) {
+            if (player?.enableAutomaticBitrateDetection) {
                 return player.enableAutomaticBitrateDetection();
             }
 
@@ -1386,7 +1365,7 @@ class PlaybackManager {
 
         self.setMaxStreamingBitrate = function (options, player) {
             player = player || self._currentPlayer;
-            if (player && player.setMaxStreamingBitrate) {
+            if (player?.setMaxStreamingBitrate) {
                 return player.setMaxStreamingBitrate(options);
             }
 
@@ -1437,15 +1416,13 @@ class PlaybackManager {
 
             if (Screenfull.isEnabled) {
                 Screenfull.toggle();
-            } else {
+            } else if (document.webkitIsFullScreen && document.webkitCancelFullscreen) {
                 // iOS Safari
-                if (document.webkitIsFullScreen && document.webkitCancelFullscreen) {
-                    document.webkitCancelFullscreen();
-                } else {
-                    const elem = document.querySelector('video');
-                    if (elem && elem.webkitEnterFullscreen) {
-                        elem.webkitEnterFullscreen();
-                    }
+                document.webkitCancelFullscreen();
+            } else {
+                const elem = document.querySelector('video');
+                if (elem?.webkitEnterFullscreen) {
+                    elem.webkitEnterFullscreen();
                 }
             }
         };
@@ -2078,7 +2055,7 @@ class PlaybackManager {
 
             const mediaSource = self.currentMediaSource(player);
 
-            if (mediaSource && mediaSource.RunTimeTicks) {
+            if (mediaSource?.RunTimeTicks) {
                 return mediaSource.RunTimeTicks;
             }
 
@@ -2123,7 +2100,7 @@ class PlaybackManager {
         const getAdditionalParts = async (items) => {
             const getOneAdditionalPart = async function (item) {
                 let retVal = [item];
-                if (item.Type === 'Movie') {
+                if (item.Type === 'Movie' || item.Type === 'Episode') {
                     const client = ServerConnections.getApiClient(item.ServerId);
                     const user = await client.getCurrentUser();
                     const additionalParts = await client.getAdditionalVideoParts(user.Id, item.Id);
@@ -2345,30 +2322,23 @@ class PlaybackManager {
 
             let prevRelIndex = 0;
             for (const stream of prevSource.MediaStreams) {
-                if (stream.Type != streamType)
-                    continue;
+                if (stream.Type != streamType) continue;
 
-                if (stream.Index == prevIndex)
-                    break;
+                if (stream.Index == prevIndex) break;
 
                 prevRelIndex += 1;
             }
 
             let newRelIndex = 0;
             for (const stream of mediaSource.MediaStreams) {
-                if (stream.Type != streamType)
-                    continue;
+                if (stream.Type != streamType) continue;
 
                 let score = 0;
 
-                if (prevStream.Codec == stream.Codec)
-                    score += 1;
-                if (prevRelIndex == newRelIndex)
-                    score += 1;
-                if (prevStream.DisplayTitle && prevStream.DisplayTitle == stream.DisplayTitle)
-                    score += 2;
-                if (prevStream.Language && prevStream.Language != 'und' && prevStream.Language == stream.Language)
-                    score += 2;
+                if (prevStream.Codec == stream.Codec) score += 1;
+                if (prevRelIndex == newRelIndex) score += 1;
+                if (prevStream.DisplayTitle && prevStream.DisplayTitle == stream.DisplayTitle) score += 2;
+                if (prevStream.Language && prevStream.Language != 'und' && prevStream.Language == stream.Language) score += 2;
 
                 console.debug(`AutoSet ${streamType} - Score ${score} for ${stream.Index} - ${stream.DisplayTitle}`);
                 if (score > bestStreamScore && score >= 3) {
@@ -2388,8 +2358,9 @@ class PlaybackManager {
                         mediaSource.DefaultSubtitleStreamIndex = bestStreamIndex;
                     }
                 }
-                if (streamType == 'Audio')
+                if (streamType == 'Audio') {
                     mediaSource.DefaultAudioStreamIndex = bestStreamIndex;
+                }
             } else {
                 console.debug(`AutoSet ${streamType} - Threshold not met. Using default.`);
             }
@@ -2614,7 +2585,7 @@ class PlaybackManager {
 
             if (mediaSource.MediaStreams && player.useFullSubtitleUrls) {
                 mediaSource.MediaStreams.forEach(stream => {
-                    if (stream.DeliveryUrl && stream.DeliveryUrl.startsWith('/')) {
+                    if (stream.DeliveryUrl?.startsWith('/')) {
                         stream.DeliveryUrl = apiClient.getUrl(stream.DeliveryUrl);
                     }
                 });
@@ -2693,7 +2664,7 @@ class PlaybackManager {
                 title: item.Name
             };
 
-            const backdropUrl = backdropImageUrl(apiClient, item, {});
+            const backdropUrl = getItemBackdropImageUrl(apiClient, item, {}, true);
             if (backdropUrl) {
                 resultInfo.backdropUrl = backdropUrl;
             }
@@ -3444,7 +3415,7 @@ class PlaybackManager {
 
                 const streamInfo = getPlayerData(player).streamInfo;
 
-                if (streamInfo && streamInfo.started && !streamInfo.ended) {
+                if (streamInfo?.started && !streamInfo.ended) {
                     reportPlayback(self, state, player, reportPlaylist, serverId, 'reportPlaybackProgress', progressEventName);
                 }
 
@@ -3515,7 +3486,7 @@ class PlaybackManager {
 
         const nextItem = this._playQueueManager.getNextItemInfo();
 
-        if (!nextItem || !nextItem.item) {
+        if (!nextItem?.item) {
             return Promise.reject();
         }
 
@@ -3656,7 +3627,7 @@ class PlaybackManager {
     async playTrailers(item) {
         const player = this._currentPlayer;
 
-        if (player && player.playTrailers) {
+        if (player?.playTrailers) {
             return player.playTrailers(item);
         }
 
@@ -3668,7 +3639,7 @@ class PlaybackManager {
             items = await apiClient.getLocalTrailers(apiClient.getCurrentUserId(), item.Id);
         }
 
-        if (!items || !items.length) {
+        if (!items?.length) {
             items = (item.RemoteTrailers || []).map((t) => {
                 return {
                     Name: t.Name || (item.Name + ' Trailer'),
@@ -3750,7 +3721,7 @@ class PlaybackManager {
     }
 
     setPlaybackRate(value, player = this._currentPlayer) {
-        if (player && player.setPlaybackRate) {
+        if (player?.setPlaybackRate) {
             player.setPlaybackRate(value);
 
             // Save the new playback rate in the browser session, to restore when playing a new video.
@@ -3759,7 +3730,7 @@ class PlaybackManager {
     }
 
     getPlaybackRate(player = this._currentPlayer) {
-        if (player && player.getPlaybackRate) {
+        if (player?.getPlaybackRate) {
             return player.getPlaybackRate();
         }
 
@@ -3767,7 +3738,7 @@ class PlaybackManager {
     }
 
     instantMix(item, player = this._currentPlayer) {
-        if (player && player.instantMix) {
+        if (player?.instantMix) {
             return player.instantMix(item);
         }
 
@@ -3788,7 +3759,7 @@ class PlaybackManager {
     }
 
     shuffle(shuffleItem, player = this._currentPlayer) {
-        if (player && player.shuffle) {
+        if (player?.shuffle) {
             return player.shuffle(shuffleItem);
         }
 
@@ -3805,7 +3776,7 @@ class PlaybackManager {
 
         const mediaSource = this.currentMediaSource(player);
 
-        const mediaStreams = (mediaSource || {}).MediaStreams || [];
+        const mediaStreams = mediaSource?.MediaStreams || [];
         return mediaStreams.filter(function (s) {
             return s.Type === 'Audio';
         }).sort(itemHelper.sortTracks);
@@ -3821,7 +3792,7 @@ class PlaybackManager {
 
         const mediaSource = this.currentMediaSource(player);
 
-        const mediaStreams = (mediaSource || {}).MediaStreams || [];
+        const mediaStreams = mediaSource?.MediaStreams || [];
         return mediaStreams.filter(function (s) {
             return s.Type === 'Subtitle';
         }).sort(itemHelper.sortTracks);
@@ -3960,7 +3931,7 @@ class PlaybackManager {
     }
 
     displayContent(options, player = this._currentPlayer) {
-        if (player && player.displayContent) {
+        if (player?.displayContent) {
             player.displayContent(options);
         }
     }

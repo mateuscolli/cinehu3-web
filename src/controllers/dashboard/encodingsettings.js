@@ -18,6 +18,7 @@ function loadPage(page, config, systemInfo) {
     page.querySelector('#chkIntelLpHevcHwEncoder').checked = config.EnableIntelLowPowerHevcHwEncoder;
     page.querySelector('#chkHardwareEncoding').checked = config.EnableHardwareEncoding;
     page.querySelector('#chkAllowHevcEncoding').checked = config.AllowHevcEncoding;
+    page.querySelector('#chkAllowAv1Encoding').checked = config.AllowAv1Encoding;
     $('#selectVideoDecoder', page).val(config.HardwareAccelerationType);
     $('#selectThreadCount', page).val(config.EncodingThreadCount);
     page.querySelector('#chkEnableAudioVbr').checked = config.EnableAudioVbr;
@@ -46,6 +47,9 @@ function loadPage(page, config, systemInfo) {
     page.querySelector('#chkDoubleRateDeinterlacing').checked = config.DeinterlaceDoubleRate;
     page.querySelector('#chkEnableSubtitleExtraction').checked = config.EnableSubtitleExtraction || false;
     page.querySelector('#chkEnableThrottling').checked = config.EnableThrottling || false;
+    page.querySelector('#chkEnableSegmentDeletion').checked = config.EnableSegmentDeletion || false;
+    page.querySelector('#txtThrottleDelaySeconds').value = config.ThrottleDelaySeconds || '';
+    page.querySelector('#txtSegmentKeepSeconds').value = config.SegmentKeepSeconds || '';
     page.querySelector('#selectVideoDecoder').dispatchEvent(new CustomEvent('change', {
         bubbles: true
     }));
@@ -104,6 +108,9 @@ function onSubmit() {
             config.DeinterlaceDoubleRate = form.querySelector('#chkDoubleRateDeinterlacing').checked;
             config.EnableSubtitleExtraction = form.querySelector('#chkEnableSubtitleExtraction').checked;
             config.EnableThrottling = form.querySelector('#chkEnableThrottling').checked;
+            config.EnableSegmentDeletion = form.querySelector('#chkEnableSegmentDeletion').checked;
+            config.ThrottleDelaySeconds = parseInt(form.querySelector('#txtThrottleDelaySeconds').value || '0', 10);
+            config.SegmentKeepSeconds = parseInt(form.querySelector('#txtSegmentKeepSeconds').value || '0', 10);
             config.HardwareDecodingCodecs = Array.prototype.map.call(Array.prototype.filter.call(form.querySelectorAll('.chkDecodeCodec'), function (c) {
                 return c.checked;
             }), function (c) {
@@ -117,6 +124,7 @@ function onSubmit() {
             config.EnableIntelLowPowerHevcHwEncoder = form.querySelector('#chkIntelLpHevcHwEncoder').checked;
             config.EnableHardwareEncoding = form.querySelector('#chkHardwareEncoding').checked;
             config.AllowHevcEncoding = form.querySelector('#chkAllowHevcEncoding').checked;
+            config.AllowAv1Encoding = form.querySelector('#chkAllowAv1Encoding').checked;
             ApiClient.updateNamedConfiguration('encoding', config).then(function () {
                 updateEncoder(form);
             }, function () {

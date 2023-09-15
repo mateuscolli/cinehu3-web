@@ -14,7 +14,7 @@ let supportsValueSetOverride = false;
 if (Object.getOwnPropertyDescriptor && Object.defineProperty) {
     const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
     // descriptor returning null in webos
-    if (descriptor && descriptor.configurable) {
+    if (descriptor?.configurable) {
         supportsValueSetOverride = true;
     }
 }
@@ -30,8 +30,9 @@ function mapClientToFraction(range, clientX) {
     const rect = range.sliderBubbleTrack.getBoundingClientRect();
 
     let fraction = (clientX - rect.left) / rect.width;
-    if (globalize.getIsElementRTL(range))
+    if (globalize.getIsElementRTL(range)) {
         fraction = (rect.right - clientX) / rect.width;
+    }
 
     // Snap to step
     const valueRange = range.max - range.min;
@@ -167,7 +168,7 @@ function setMarker(range, valueMarker, marker, valueProgress) {
 }
 
 function updateMarkers(range, currentValue) {
-    if (range.markerInfo && range.markerInfo.length && range.markerElements && range.markerElements.length) {
+    if (range.markerInfo?.length && range.markerElements?.length) {
         for (let i = 0, length = range.markerElements.length; i < length; i++) {
             if (range.markerInfo.length > i) {
                 setMarker(range, mapFractionToValue(range, range.markerInfo[i].progress), range.markerElements[i], currentValue);
@@ -382,6 +383,8 @@ EmbySliderPrototype.attachedCallback = function () {
     } else {
         startInterval(this);
     }
+
+    updateValues.call(this);
 };
 
 /**
@@ -488,10 +491,11 @@ EmbySliderPrototype.setKeyboardSteps = function (stepDown, stepUp) {
 
 function setRange(elem, startPercent, endPercent) {
     const style = elem.style;
-    if (globalize.getIsRTL())
+    if (globalize.getIsRTL()) {
         style.right = Math.max(startPercent, 0) + '%';
-    else
+    } else {
         style.left = Math.max(startPercent, 0) + '%';
+    }
 
     const widthPercent = endPercent - startPercent;
     style.width = Math.max(Math.min(widthPercent, 100), 0) + '%';

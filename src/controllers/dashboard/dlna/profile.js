@@ -272,10 +272,8 @@ function renderDirectPlayProfiles(page, profiles) {
         if (profile.Type == 'Video') {
             html += '<p>' + globalize.translate('ValueVideoCodec', profile.VideoCodec || allText) + '</p>';
             html += '<p>' + globalize.translate('ValueAudioCodec', profile.AudioCodec || allText) + '</p>';
-        } else {
-            if (profile.Type == 'Audio') {
-                html += '<p>' + globalize.translate('ValueCodec', profile.AudioCodec || allText) + '</p>';
-            }
+        } else if (profile.Type == 'Audio') {
+            html += '<p>' + globalize.translate('ValueCodec', profile.AudioCodec || allText) + '</p>';
         }
 
         html += '</a>';
@@ -333,10 +331,8 @@ function renderTranscodingProfiles(page, profiles) {
         if (profile.Type == 'Video') {
             html += '<p>' + globalize.translate('ValueVideoCodec', profile.VideoCodec || allText) + '</p>';
             html += '<p>' + globalize.translate('ValueAudioCodec', profile.AudioCodec || allText) + '</p>';
-        } else {
-            if (profile.Type == 'Audio') {
-                html += '<p>' + globalize.translate('ValueCodec', profile.AudioCodec || allText) + '</p>';
-            }
+        } else if (profile.Type == 'Audio') {
+            html += '<p>' + globalize.translate('ValueCodec', profile.AudioCodec || allText) + '</p>';
         }
 
         html += '</a>';
@@ -415,7 +411,7 @@ function renderContainerProfiles(page, profiles) {
         html += '<a is="emby-linkbutton" href="#" class="lnkEditSubProfile" data-profileindex="' + i + '">';
         html += '<p>' + globalize.translate('ValueContainer', profile.Container || allText) + '</p>';
 
-        if (profile.Conditions && profile.Conditions.length) {
+        if (profile.Conditions?.length) {
             html += '<p>';
             html += globalize.translate('ValueConditions', profile.Conditions.map(function (c) {
                 return c.Property;
@@ -487,7 +483,7 @@ function renderCodecProfiles(page, profiles) {
         html += '<a is="emby-linkbutton" href="#" class="lnkEditSubProfile" data-profileindex="' + i + '">';
         html += '<p>' + globalize.translate('ValueCodec', profile.Codec || allText) + '</p>';
 
-        if (profile.Conditions && profile.Conditions.length) {
+        if (profile.Conditions?.length) {
             html += '<p>';
             html += globalize.translate('ValueConditions', profile.Conditions.map(function (c) {
                 return c.Property;
@@ -561,13 +557,11 @@ function renderResponseProfiles(page, profiles) {
         if (profile.Type == 'Video') {
             html += '<p>' + globalize.translate('ValueVideoCodec', profile.VideoCodec || allText) + '</p>';
             html += '<p>' + globalize.translate('ValueAudioCodec', profile.AudioCodec || allText) + '</p>';
-        } else {
-            if (profile.Type == 'Audio') {
-                html += '<p>' + globalize.translate('ValueCodec', profile.AudioCodec || allText) + '</p>';
-            }
+        } else if (profile.Type == 'Audio') {
+            html += '<p>' + globalize.translate('ValueCodec', profile.AudioCodec || allText) + '</p>';
         }
 
-        if (profile.Conditions && profile.Conditions.length) {
+        if (profile.Conditions?.length) {
             html += '<p>';
             html += globalize.translate('ValueConditions', profile.Conditions.map(function (c) {
                 return c.Property;

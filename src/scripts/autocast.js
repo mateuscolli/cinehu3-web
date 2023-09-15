@@ -12,7 +12,7 @@ export function enable(enabled) {
     if (enabled) {
         const currentPlayerInfo = playbackManager.getPlayerInfo();
 
-        if (currentPlayerInfo && currentPlayerInfo.id) {
+        if (currentPlayerInfo?.id) {
             localStorage.setItem('autocastPlayerId', currentPlayerInfo.id);
         }
     } else {
@@ -26,7 +26,7 @@ export function isEnabled() {
     const playerId = localStorage.getItem('autocastPlayerId');
     const currentPlayerInfo = playbackManager.getPlayerInfo();
 
-    return (currentPlayerInfo && playerId && currentPlayerInfo.id === playerId);
+    return playerId && currentPlayerInfo?.id === playerId;
 }
 
 function onOpen() {

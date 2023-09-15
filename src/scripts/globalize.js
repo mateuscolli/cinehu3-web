@@ -37,7 +37,7 @@ function getDefaultLanguage() {
     if (navigator.userLanguage) {
         return navigator.userLanguage;
     }
-    if (navigator.languages && navigator.languages.length) {
+    if (navigator.languages?.length) {
         return navigator.languages[0];
     }
 
@@ -64,8 +64,9 @@ function checkAndProcessDir(culture) {
 function setDocumentDirection(direction) {
     document.getElementsByTagName('body')[0].setAttribute('dir', direction);
     document.getElementsByTagName('html')[0].setAttribute('dir', direction);
-    if (direction === Direction.rtl)
+    if (direction === Direction.rtl) {
         import('../styles/rtl.scss');
+    }
 }
 
 export function getIsElementRTL(element) {
@@ -217,12 +218,12 @@ function translateKey(key) {
 
 function translateKeyFromModule(key, module) {
     let dictionary = getDictionary(module, getCurrentLocale());
-    if (dictionary && dictionary[key]) {
+    if (dictionary?.[key]) {
         return dictionary[key];
     }
 
     dictionary = getDictionary(module, fallbackCulture);
-    if (dictionary && dictionary[key]) {
+    if (dictionary?.[key]) {
         return dictionary[key];
     }
 
