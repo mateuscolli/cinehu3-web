@@ -239,7 +239,7 @@ function translateKeyFromModule(key, module) {
 export function translate(key) {
     let val = translateKey(key);
     for (let i = 1; i < arguments.length; i++) {
-        val = val.replaceAll('{' + (i - 1) + '}', arguments[i].toLocaleString(currentCulture));
+        val = val.replaceAll('{' + (i - 1) + '}', arguments[i]?.toLocaleString(currentCulture));
     }
     return val;
 }
